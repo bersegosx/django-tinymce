@@ -7,6 +7,10 @@ var django = django || {
     if ($e.parents('.empty-form').length == 0) {  // Don't do empty inlines
       var mce_conf = $.parseJSON($e.attr('data-mce-conf'));
       var id = $e.attr('id');
+      // disable grapelli
+      if (id.indexOf('__prefix__') !== -1) {
+        return
+      }
       if ('elements' in mce_conf && mce_conf['mode'] == 'exact') {
         mce_conf['elements'] = id;
       }
@@ -28,12 +32,11 @@ var django = django || {
     // initialize the TinyMCE editor after adding an inline
     // XXX: We don't use jQuery's click event as it won't work in Django 1.4
     document.body.addEventListener("click", function(ev) {
-      if(!ev.target.parentNode || ev.target.parentNode.className.indexOf("add-row") === -1) {
+      if (!ev.target.parentNode || (ev.target.parentNode.className.indexOf("add-row") === -1 && ev.target.parentNode.className.indexOf("grp-add-handler") === -1)) {
         return;
       }
-      var $addRow = $(ev.target.parentNode);
       setTimeout(function() {  // We have to wait until the inline is added
-        $('textarea.tinymce', $addRow.parent()).each(function () {
+        $('textarea.tinymce').each(function () {
           initTinyMCE($(this));
         });
       }, 0);
